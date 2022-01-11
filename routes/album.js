@@ -57,6 +57,15 @@ router.get("/update/:id", async (req, res, next) => {
   }
 })
 // GET - delete one album
+router.get("/delete/:id", async (req, res, next) => {
+  try {
+    await AlbumModel.findByIdAndDelete(req.params.id)
+    res.redirect("/dashboard/album")
+  }
+  catch (err) {
+    next(err);
+  }
+})
 
 // POST - create one album
 router.post("/", uploader.single("cover"), async (req, res, next) => {
