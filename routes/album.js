@@ -6,12 +6,23 @@ const LabelModel = require("./../model/Label");
 const uploader = require("./../config/cloudinary");
 
 // router.use(protectAdminRoute);
+router.post("/update/:id", uploader.single("cover"), async (req, res, next) => {
+  console.log(req.body)
+  const updatedAlbum = { ...req.body };
+  if (!req.file) updatedAlbum.cover = undefined;
+  else updatedAlbum.cover = req.file.path;
 
+  try {
+    const updateOneAlbum = await AlbumModel.findByIdAndUpdate(req.params.id, updatedAlbum);
+    res.redirect("/dashboard/album")
+  } catch (err) {
+    next(err);
+  }
+})
 // GET - all albums
 router.get("/", async (req, res, next) => {
   try {
     albums = await AlbumModel.find().populate("artist label");
-    console.log(albums);
     res.render("dashboard/albums", {
       albums,
     });
@@ -22,14 +33,29 @@ router.get("/", async (req, res, next) => {
 
 // GET - create one album (form)
 router.get("/create", async (req, res, next) => {
-  const artists = await ArtistModel.find();
-  const labels = await LabelModel.find();
-  const albums = await AlbumModel.find().populate("artist label");
-  res.render("dashboard/albumCreate", { artists, labels });
+  try {
+    const artists = await ArtistModel.find();
+    const labels = await LabelModel.find();
+    const albums = await AlbumModel.find().populate("artist label");
+    res.render("dashboard/albumCreate", { artists, labels });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // GET - update one album (form)
-
+router.get("/update/:id", async (req, res, next) => {
+  try {
+    const album = await AlbumModel.findById(req.params.id).populate("artist label");
+    const allArtists = await ArtistModel.find();
+    const allLabels = await LabelModel.find();
+    res.render("dashboard/albumUpdate", {
+      album, allArtists, allLabels
+    })
+  } catch (err) {
+    next(err);
+  }
+})
 // GET - delete one album
 
 // POST - create one album
