@@ -6,7 +6,9 @@ const artistSchema = new Schema(
     name: String,
     isBand: Boolean,
     description: String,
-    styles: [],
+    styles: [
+      mongoose.Schema.Types.ObjectId
+    ],
     picture: {
       type: String,
       default:
